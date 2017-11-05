@@ -19,7 +19,9 @@ public class PSO {
         ChordSequence chSeq = new ChordSequence(values);
 
         ChordSequence.Particle bestChordBases = chSeq.generateBaseOfChords();
+
         ChordOptimization chOpt = new ChordOptimization(bestChordBases.notes);
+
         Chord chords[] = chOpt.generateChords();
 
         return chords;
@@ -34,7 +36,7 @@ public class PSO {
         private final int Iterations = 10;
         private final double MAGIC_BLOCK = 0.5;
 
-        private double globalBest[] = {60, 60, 60};
+        private double globalBest[] = new double[ChordsAmount];
         private double globalFitness = 100500;
 
         ChordSequence(double values[]) {
@@ -60,9 +62,8 @@ public class PSO {
         }
 
         private Particle[] generateParticles() {
-
-            Particle particles[] = new Particle[Iterations];
-            for (int i = 0; i < Iterations; i++)
+            Particle particles[] = new Particle[Population];
+            for (int i = 0; i < Population; i++)
                 particles[i] = new Particle(ChordsAmount);
             return particles;
         }
@@ -73,12 +74,12 @@ public class PSO {
             optimize(particles);
 
             int index = 0;
-            for (int i = 1; i < particles.length; i++)
+            for (int i = 1; i < Population; i++)
                 if (particles[i].fitness < particles[index].fitness)
                     index = i;
 
             Particle p = particles[index];
-            for (int i = 0; i < p.notes.length; i++)
+            for (int i = 0; i < ChordsAmount; i++)
                 p.notes[i] = Math.round(66 + p.notes[i] * 6);
 
             return p;
@@ -105,7 +106,7 @@ public class PSO {
                     int rand1 = random.nextInt(2);
                     int rand2 = random.nextInt(2);
 
-                    for (int i = 0; i < p.velocity.length; i++)
+                    for (int i = 0; i < ChordsAmount; i++)
                         p.velocity[i] = m * p.velocity[i] + c1 * rand1 * (p.myBest[i] - p.notes[i]) + c2 * rand2 * (globalBest[i] - p.notes[i]);
 
                 }
@@ -114,7 +115,7 @@ public class PSO {
 
         private double fitnessFunction(Particle particle) {
             double value = 0;
-            for (int i = 0; i < Population; i++) {
+            for (int i = 0; i < ChordsAmount; i++) {
                 double error = particle.notes[i] - values[i];
                 value += Math.pow(error, 2);
             }
@@ -126,7 +127,7 @@ public class PSO {
 
     private class ChordOptimization {
         private double basements[];
-        private double globalBest[] = {60, 60, 60};
+        private double globalBest[] = new double[ChordNotesAmount];
         private double globalFitness = 100500;
 
         private final double MAGIC_BLOCK = 4.0;
@@ -143,6 +144,10 @@ public class PSO {
             public double fitness;
 
             Particle(double basement) {
+                notes = new double[ChordNotesAmount];
+                myBest = new double[ChordNotesAmount];
+                velocity = new double[ChordNotesAmount];
+
                 notes[0] = basement;
                 notes[1] = random.nextInt(13) + 60;
                 notes[2] = random.nextInt(13) + 60;
@@ -164,8 +169,8 @@ public class PSO {
             Chord chords[] = new Chord[ChordsAmount];
             for (int index = 0; index < basements.length; index++) {
                 Particle particles[] = new Particle[Population];
-                for (Particle p: particles)
-                    p = new Particle(basements[index]);
+                for (int i = 0; i < Population; i++)
+                    particles[i] = new Particle(basements[index]);
 
                 optimize(particles);
 
