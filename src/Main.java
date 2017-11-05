@@ -42,8 +42,21 @@ public final class Main implements JMC {
             values[i] = Math.sin(values[i]);
         }
 
-        PSO pso = new PSO(values);
-        Chord chords[] = pso.generateChords();
+        for (int trie = 0; trie < 5; trie++) {
+            PSO pso = new PSO(values);
+            Chord chords[] = pso.generateChords();
+
+            for (int i = 0; i < 16; i++) {
+                CPhrase chord = new CPhrase();
+                chord.addChord(chords[i].notes, C);
+                p.addCPhrase(chord);
+            }
+
+            s.addPart(p);
+            String name = "Try" + Integer.toString(trie) + ".mid";
+            Write.midi(s, name);
+            p = new Part("Piano", 0, 0);
+        }
     }
 
     private static void rootPosition(int rootPitch) {
