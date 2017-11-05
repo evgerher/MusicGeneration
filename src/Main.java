@@ -56,6 +56,7 @@ public final class Main implements JMC {
             String name = "Try" + Integer.toString(trie) + ".mid";
             Write.midi(s, name);
             p = new Part("Piano", 0, 0);
+            s = new Score("CPhrase class example");
         }
     }
 
