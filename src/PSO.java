@@ -9,62 +9,72 @@ public class PSO {
         random = new Random();
     }
 
-    private static class Particle {
-        public int notes[];
-        public int myBest[];
-        public int velocity[];
-        public static int globalBest[] = {60, 60, 60};
-        public static int globalFitness = 0;
-        public int fitness;
-
-        Particle(int notesAmount) {
-            notes = new int[notesAmount];
-            myBest = new int[notesAmount];
-            velocity = new int[notesAmount];
-            for (int i = 0; i < notesAmount; i++) {
-                notes[i] = random.nextInt(12) + 60;
-                myBest[i] = notes[i];
-                velocity[i] = 0;
-            }
-        }
-    }
-
     public static class ChordOptimization {
-
+        private static double values[];
         private static double c1;
         private static double c2;
         private static double m;
         private static int bestTonics[] = {60, 64, 65};
+        final int population = 30;
 
+        ChordOptimization(double values[]) {
+            this.values = values;
+        }
 
-        private static Particle[] generateParticles() {
-            Particle particles[] = new Particle[50];
-            for (int i = 0; i < 50; i++)
-                particles[i] = new Particle(3);
+        private class Particle {
+            public double notes[];
+            public double myBest[];
+            public double velocity[];
+            public double fitness;
+
+            public final double globalBest[] = {60, 60, 60};
+            public static double globalFitness = 0;
+
+            Particle(int notesAmount) {
+                notes = new double[notesAmount];
+                myBest = new double[notesAmount];
+                velocity = new double[notesAmount];
+                for (int i = 0; i < notesAmount; i++) {
+                    notes[i] = random.nextDouble() * 2 - 1;
+                    myBest[i] = notes[i];
+                    velocity[i] = 0;
+                }
+            }
+        }
+
+        private Particle[] generateParticles() {
+
+            Particle particles[] = new Particle[population];
+            for (int i = 0; i < population; i++)
+                particles[i] = new Particle(16);
             return particles;
         }
 
-        public static Chord[] generateChords() {
+        public Particle generateChords() {
             Particle particles[] = generateParticles();
 
             optimize(particles);
 
 
-            Chord chords[] = new Chord[1];
-            return chords;
+            Particle particle = new Particle(3);
+            return particle;
         }
 
-        private static void optimize(Particle[] particles) {
+        private void optimize(Particle[] particles) {
             for (Particle p : particles) {
-                int fitness = fitnessFunction(p);
-                if (fitness > p.fitness) {
+                double fitness = fitnessFunction(p);
+                if (fitness < p.fitness) {
                     p.fitness = fitness;
                     for (int i = 0; i < 3; i++)
                         p.myBest[i] = p.notes[i];
                 }
-            }
 
-            chooseBestParticle();
+                if (fitness < p.globalFitness) {
+                    p.globalFitness = fitness;
+                    for (int i = 0; i < 3; i++)
+                        p.globalBest[i] = p.notes[i];
+                }
+            }
 
             for (Particle p : particles) {
                 int rand1 = random.nextInt(1);
@@ -76,23 +86,14 @@ public class PSO {
             }
         }
 
-        private static int fitnessFunction(Particle particle) {
-            int value = 50;
-            int notes[] = particle.notes;
-            int tonicDiff = minTonicDiff(notes[0]);
-            int dominantDiff = Math.abs(notes[1] - (notes[0] + 4));
-            int subdominantDiff = Math.abs(notes[2] - (notes[0] + 7));
+        private double fitnessFunction(Particle particle) {
+            double value = 0;
+            for (int i = 0; i < population; i++) {
+                double error = particle.notes[i] - values[i];
+                value += Math.pow(error, 2);
+            }
 
-            return value - tonicDiff * 2 - dominantDiff - subdominantDiff;
-        }
-
-        private static int minTonicDiff(int tonic) {
-            int min = 100;
-            for (int i = 0; i < bestTonics.length; i++)
-                if (Math.abs(bestTonics[i] - tonic) < min)
-                    min = Math.abs(bestTonics[i] - tonic);
-
-            return min;
+            return value;
         }
 
     }
