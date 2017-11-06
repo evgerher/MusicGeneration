@@ -5,7 +5,8 @@ import java.util.Random;
  */
 public class PSO {
     private Random random;
-    double values[];
+    private double values[];
+    private Chord chords[];
     private final int ChordNotesAmount = 3;
     private final int ChordsAmount = 16;
 
@@ -25,6 +26,13 @@ public class PSO {
         Chord chords[] = chOpt.generateChords();
 
         return chords;
+    }
+
+    public PairNote[] generatePairNotes(Chord chords[]) {
+        PairNoteOptimization pso = new PairNoteOptimization(chords);
+        PairNote notes[] = pso.generatePairNotes();
+
+        return notes;
     }
 
     public class ChordSequence {
@@ -221,7 +229,7 @@ public class PSO {
     }
 
     public class PairNoteOptimization {
-        private double basements[];
+        private Chord chords[];
         private double globalBest[] = new double[2];
         private double globalFitness = 100500;
 
@@ -233,35 +241,42 @@ public class PSO {
         private final int Iterations = 10;
 
         private class Particle {
+            public int chordNotes[];
             public double notes[];
             public double myBest[];
             public double velocity[];
             public double fitness;
 
-            Particle(double basement) {
+            Particle(Chord chord) {
+                chordNotes = chord.notes;
                 notes = new double[2];
                 myBest = new double[2];
                 velocity = new double[2];
 
-                notes[0] = basement;
-                notes[1] = random.nextInt(13) + 60;
+                notes[0] = random.nextDouble() * 12 + 72;
+                notes[1] = random.nextDouble() * 12 + 72;
             }
         }
 
-        PairNoteOptimization(double basements[]) {
-            this.basements = basements;
+        PairNoteOptimization(Chord chords[]) {
+            this.chords = chords;
         }
 
         private double fitnessFunction(Particle p) {
+            double diff1 = Math.abs((p.chordNotes[0] + 12) - p.notes[0]);
+            double diff2 = Math.abs((p.chordNotes[1] + 12) - p.notes[0]);
+            double diff3 = Math.abs((p.chordNotes[2] + 12) - p.notes[0]);
 
+            double diff_min = Math.min(diff1, diff2);
+            return Math.min(diff_min, diff3);
         }
 
-        public Chord[] generatePairNotes() {
+        public PairNote[] generatePairNotes() {
             PairNote pairNotes[] = new PairNote[ChordsAmount];
-            for (int index = 0; index < basements.length; index++) {
+            for (int index = 0; index < chords.length; index++) {
                 Particle particles[] = new Particle[Population];
                 for (int i = 0; i < Population; i++)
-                    particles[i] = new Particle(basements[index]);
+                    particles[i] = new Particle(chords[index]);
 
                 optimize(particles);
 
@@ -271,14 +286,14 @@ public class PSO {
                         best = i;
 
                 Particle bestParticle = particles[best];
-                int notes[] = new int[ChordNotesAmount];
-                for (int k = 0; k < ChordNotesAmount; k++)
+                int notes[] = new int[2];
+                for (int k = 0; k < 2; k++)
                     notes[k] = (int)Math.round(bestParticle.notes[k]);
 
-                chords[index] = new Chord(notes);
+                pairNotes[index] = new PairNote(notes);
             }
 
-            return chords;
+            return pairNotes;
         }
 
         private void optimize(Particle particles[]) {
@@ -287,13 +302,13 @@ public class PSO {
                     double fitness = fitnessFunction(p);
                     if (fitness < p.fitness) {
                         p.fitness = fitness;
-                        for (int i = 0; i < ChordNotesAmount; i++)
+                        for (int i = 0; i < 2; i++)
                             p.myBest[i] = p.notes[i];
                     }
 
                     if (fitness < globalFitness) {
                         globalFitness = fitness;
-                        for (int i = 0; i < ChordNotesAmount; i++)
+                        for (int i = 0; i < 2; i++)
                             globalBest[i] = p.notes[i];
                     }
                 }

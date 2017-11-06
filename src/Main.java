@@ -27,6 +27,7 @@ public final class Main implements JMC {
         p = new Part("Chords", 0, 0);
         p1 = new Part("PairNote", 0, 1);
 
+        int temp[] = new int[1];
         double values[] = new double[16];
 
         double step = 360.0 / 16;
@@ -40,6 +41,7 @@ public final class Main implements JMC {
 
             PSO pso = new PSO(values);
             Chord chords[] = pso.generateChords();
+            PairNote pairNotes[] = pso.generatePairNotes(chords);
 
             for (int i = 0; i < 16; i++) {
                 CPhrase chord = new CPhrase();
@@ -47,7 +49,18 @@ public final class Main implements JMC {
                 p.addCPhrase(chord);
             }
 
+            for (int i = 0; i < 16; i++) {
+                CPhrase pairNote = new CPhrase();
+
+                for (int j = 0; j < 2; j++) {
+                    temp[0] = pairNotes[i].notes[j];
+                    pairNote.addChord(temp, 0.5);
+                }
+                p1.addCPhrase(pairNote);
+            }
+
             s.addPart(p);
+            s.addPart(p1);
             String name = "Try" + Integer.toString(trie) + ".mid";
             Write.midi(s, name);
 
