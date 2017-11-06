@@ -90,6 +90,11 @@ public class PSO {
             for (int i = 0; i < ChordsAmount; i++)
                 p.notes[i] = Math.round(66 + p.notes[i] * 6);
 
+            System.out.printf("\n\nBasement of chord [");
+            for (int i = 0; i < 15; i++)
+                System.out.printf("%d ", (int)Math.round(p.notes[i]));
+            System.out.printf("%d]\n\n", (int)Math.round(p.notes[15]));
+
             return p;
         }
 
@@ -152,7 +157,7 @@ public class PSO {
             public double velocity[];
             public double fitness;
 
-            Particle(double basement) {
+            Particle() {
                 notes = new double[ChordNotesAmount];
                 myBest = new double[ChordNotesAmount];
                 velocity = new double[ChordNotesAmount];
@@ -168,8 +173,8 @@ public class PSO {
         }
 
         private double fitnessFunction(Particle p) {
-            double diff1 = Math.abs(p.notes[1] - p.notes[0]);
-            double diff2 = Math.abs(p.notes[2] - p.notes[0]);
+            double diff1 = Math.abs(p.notes[1] - (p.notes[0] + 4) );
+            double diff2 = Math.abs(p.notes[2] - (p.notes[0] + 7));
 
             return diff1 + diff2;
         }
@@ -179,7 +184,7 @@ public class PSO {
             for (int index = 0; index < basements.length; index++) {
                 Particle particles[] = new Particle[Population];
                 for (int i = 0; i < Population; i++)
-                    particles[i] = new Particle(basements[index]);
+                    particles[i] = new Particle();
 
                 optimize(particles);
 
@@ -190,8 +195,9 @@ public class PSO {
 
                 Particle bestParticle = particles[best];
                 int notes[] = new int[ChordNotesAmount];
-                for (int k = 0; k < ChordNotesAmount; k++)
-                    notes[k] = (int)Math.round(bestParticle.notes[k]);
+                notes[0] = (int)Math.round(basements[index]);
+                for (int k = 1; k < ChordNotesAmount; k++)
+                    notes[k] = (int)Math.round(bestParticle.notes[k] + notes[0]);
 
                 chords[index] = new Chord(notes);
             }
