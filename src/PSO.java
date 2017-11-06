@@ -37,12 +37,12 @@ public class PSO {
 
     public class ChordSequence {
         private final double values[];
-        private final double c1 = 1;
-        private final double c2 = 1;
-        private final double m = 1;
-        private final int Population = 30;
-        private final int Iterations = 10;
-        private final double MAGIC_BLOCK = 0.5;
+        private final double c1 = 1.05;
+        private final double c2 = 1.05;
+        private final double m = 0.6;
+        private final int Population = 25;
+        private final int Iterations = 200;
+        private final double MAGIC_BLOCK = 2.5;
 
         private double globalBest[] = new double[ChordsAmount];
         private double globalFitness = 100500;
@@ -92,7 +92,7 @@ public class PSO {
 
             System.out.printf("\n\nBasement of chord [");
             for (int i = 0; i < 15; i++)
-                System.out.printf("%d ", (int)Math.round(p.notes[i]));
+                System.out.printf("%d, ", (int)Math.round(p.notes[i]));
             System.out.printf("%d]\n\n", (int)Math.round(p.notes[15]));
 
             return p;
@@ -100,8 +100,14 @@ public class PSO {
 
         private void optimize(Particle[] particles) {
             for (int iteration = 0; iteration < Iterations && globalFitness > MAGIC_BLOCK; iteration++) {
+                int as = 0;
+                if (iteration % 50 == 0)
+                    System.out.printf("Iteration %d :: global fitness :: %.2f\n", iteration, globalFitness);
                 for (Particle p : particles) {
                     double fitness = fitnessFunction(p);
+                    if (iteration % 50 == 0 && as == 0)
+                        System.out.printf("Fitness[%d] == %.2f\n", as, fitness);
+                    as++;
                     if (fitness < p.fitness) {
                         p.fitness = fitness;
                         for (int i = 0; i < ChordsAmount; i++)
@@ -119,9 +125,10 @@ public class PSO {
                     int rand1 = random.nextInt(2);
                     int rand2 = random.nextInt(2);
 
-                    for (int i = 0; i < ChordsAmount; i++)
+                    for (int i = 0; i < ChordsAmount; i++) {
                         p.velocity[i] = m * p.velocity[i] + c1 * rand1 * (p.myBest[i] - p.notes[i]) + c2 * rand2 * (globalBest[i] - p.notes[i]);
-
+                        p.notes[i] = p.notes[i] + p.velocity[i];
+                    }
                 }
             }
         }
@@ -173,7 +180,7 @@ public class PSO {
         }
 
         private double fitnessFunction(Particle p) {
-            double diff1 = Math.abs(p.notes[1] - (p.notes[0] + 4) );
+            double diff1 = Math.abs(p.notes[1] - (p.notes[0] + 4));
             double diff2 = Math.abs(p.notes[2] - (p.notes[0] + 7));
 
             return diff1 + diff2;
@@ -226,8 +233,10 @@ public class PSO {
                     int rand1 = random.nextInt(2);
                     int rand2 = random.nextInt(2);
 
-                    for (int i = 0; i < p.velocity.length; i++)
+                    for (int i = 0; i < p.velocity.length; i++) {
                         p.velocity[i] = m * p.velocity[i] + c1 * rand1 * (p.myBest[i] - p.notes[i]) + c2 * rand2 * (globalBest[i] - p.notes[i]);
+                        p.notes[i] = p.notes[i] + p.velocity[i];
+                    }
 
                 }
             }
@@ -323,9 +332,10 @@ public class PSO {
                     int rand1 = random.nextInt(2);
                     int rand2 = random.nextInt(2);
 
-                    for (int i = 0; i < p.velocity.length; i++)
+                    for (int i = 0; i < p.velocity.length; i++) {
                         p.velocity[i] = m * p.velocity[i] + c1 * rand1 * (p.myBest[i] - p.notes[i]) + c2 * rand2 * (globalBest[i] - p.notes[i]);
-
+                        p.notes[i] = p.notes[i] + p.velocity[i];
+                    }
                 }
             }
         }
