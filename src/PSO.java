@@ -41,8 +41,8 @@ public class PSO {
         private final double c2 = 1.05;
         private final double m = 0.6;
         private final int Population = 25;
-        private final int Iterations = 200;
-        private final double MAGIC_BLOCK = 2.5;
+        private final int Iterations = 500;
+        private final double MAGIC_BLOCK = 0.85;
 
         private double globalBest[] = new double[ChordsAmount];
         private double globalFitness = 100500;
