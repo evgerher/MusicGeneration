@@ -37,12 +37,12 @@ public class PSO {
 
     public class ChordSequence {
         private final double values[];
-        private final double c1 = 1.05;
-        private final double c2 = 1.05;
-        private final double m = 0.6;
+        private final double c1 = 1.035;
+        private final double c2 = 1.035;
+        private final double m = 0.65;
         private final int Population = 25;
-        private final int Iterations = 500;
-        private final double MAGIC_BLOCK = 0.85;
+        private final int Iterations = 300;
+        private final double MAGIC_BLOCK = 0.92;
 
         private double globalBest[] = new double[ChordsAmount];
         private double globalFitness = 100500;
@@ -99,15 +99,10 @@ public class PSO {
         }
 
         private void optimize(Particle[] particles) {
-            for (int iteration = 0; iteration < Iterations && globalFitness > MAGIC_BLOCK; iteration++) {
-                int as = 0;
-                if (iteration % 50 == 0)
-                    System.out.printf("Iteration %d :: global fitness :: %.2f\n", iteration, globalFitness);
+            int iteration;
+            for (iteration = 0; iteration < Iterations && globalFitness > MAGIC_BLOCK; iteration++) {
                 for (Particle p : particles) {
                     double fitness = fitnessFunction(p);
-                    if (iteration % 50 == 0 && as == 0)
-                        System.out.printf("Fitness[%d] == %.2f\n", as, fitness);
-                    as++;
                     if (fitness < p.fitness) {
                         p.fitness = fitness;
                         for (int i = 0; i < ChordsAmount; i++)
@@ -131,6 +126,7 @@ public class PSO {
                     }
                 }
             }
+            System.out.println("Iteration = " + Integer.toString(iteration));
         }
 
         private double fitnessFunction(Particle particle) {
@@ -150,24 +146,25 @@ public class PSO {
         private double globalBest[] = new double[ChordNotesAmount];
         private double globalFitness = 100500;
 
-        private final double MAGIC_BLOCK = 4.0;
-        private final double c1 = 1;
-        private final double c2 = 1;
-        private final double m = 1;
-        private final int Population = 15;
-        private final int Iterations = 10;
+        private final double MAGIC_BLOCK = 0.9;
+        private final double c1 = 1.1;
+        private final double c2 = 1.2;
+        private final double m = 0.75;
+        private final int Population = 20;
+        private final int Iterations = 100;
 
         private class Particle {
-            //TODO переделать вектор
             public double notes[];
             public double myBest[];
             public double velocity[];
+            public boolean blocked[];
             public double fitness;
 
             Particle() {
                 notes = new double[ChordNotesAmount];
                 myBest = new double[ChordNotesAmount];
                 velocity = new double[ChordNotesAmount];
+                blocked = new boolean[ChordNotesAmount];
 
                 notes[0] = 0;
                 notes[1] = random.nextDouble() * 12;
@@ -180,10 +177,14 @@ public class PSO {
         }
 
         private double fitnessFunction(Particle p) {
-            double diff1 = Math.abs(p.notes[1] - (p.notes[0] + 4));
-            double diff2 = Math.abs(p.notes[2] - (p.notes[0] + 7));
+            double diff1 = p.notes[1] - (p.notes[0] + 4);
+            double diff2 = p.notes[2] - (p.notes[0] + 7);
+            if (diff1 < 1 && diff1 > -1)
+                p.blocked[0] = true;
+            if (diff2 < 1 && diff2 > -1)
+                p.blocked[1] = true;
 
-            return diff1 + diff2;
+            return Math.abs(diff1 + diff2);
         }
 
         public Chord[] generateChords() {
@@ -206,14 +207,24 @@ public class PSO {
                 for (int k = 1; k < ChordNotesAmount; k++)
                     notes[k] = (int)Math.round(bestParticle.notes[k] + notes[0]);
 
+                System.out.printf("Best chord :: [%d %d %d]\n", notes[0], notes[1], notes[2]);
                 chords[index] = new Chord(notes);
             }
 
+            for (int i = 0; i < chords.length; i++) {
+                System.out.printf("[ ");
+                for(int j = 0; j < chords[0].notes.length; j++) {
+                    System.out.printf("%d ", chords[i].notes[j]);
+                }
+                System.out.printf("]\n");
+            }
             return chords;
         }
 
         private void optimize(Particle particles[]) {
-            for (int iteration = 0; iteration < Iterations && globalFitness > MAGIC_BLOCK; iteration++) {
+            int iteration;
+            globalFitness = 100500;
+            for (iteration = 0; iteration < Iterations && globalFitness > MAGIC_BLOCK; iteration++) {
                 for (Particle p: particles) {
                     double fitness = fitnessFunction(p);
                     if (fitness < p.fitness) {
@@ -234,12 +245,16 @@ public class PSO {
                     int rand2 = random.nextInt(2);
 
                     for (int i = 0; i < p.velocity.length; i++) {
-                        p.velocity[i] = m * p.velocity[i] + c1 * rand1 * (p.myBest[i] - p.notes[i]) + c2 * rand2 * (globalBest[i] - p.notes[i]);
-                        p.notes[i] = p.notes[i] + p.velocity[i];
+                        if (!p.blocked[i]) {
+                            p.velocity[i] = m * p.velocity[i] + c1 * rand1 * (p.myBest[i] - p.notes[i]) + c2 * rand2 * (globalBest[i] - p.notes[i]);
+                            p.notes[i] = p.notes[i] + p.velocity[i];
+                        }
                     }
 
                 }
             }
+            System.out.println("BestFitness :: " + Double.toString(globalFitness));
+            System.out.println("ChordOptEndIteration :: " + Integer.toString(iteration));
         }
     }
 
@@ -312,6 +327,7 @@ public class PSO {
         }
 
         private void optimize(Particle particles[]) {
+            globalFitness = 100500;
             for (int iteration = 0; iteration < Iterations && globalFitness > MAGIC_BLOCK; iteration++) {
                 for (Particle p: particles) {
                     double fitness = fitnessFunction(p);
