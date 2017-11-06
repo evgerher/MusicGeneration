@@ -138,6 +138,7 @@ public class PSO {
         private final int Iterations = 10;
 
         private class Particle {
+            //TODO переделать вектор
             public double notes[];
             public double myBest[];
             public double velocity[];
@@ -148,9 +149,9 @@ public class PSO {
                 myBest = new double[ChordNotesAmount];
                 velocity = new double[ChordNotesAmount];
 
-                notes[0] = basement;
-                notes[1] = random.nextInt(13) + 60;
-                notes[2] = random.nextInt(13) + 60;
+                notes[0] = 0;
+                notes[1] = random.nextDouble() * 12;
+                notes[2] = random.nextDouble() * 12;
             }
         }
 
@@ -220,6 +221,92 @@ public class PSO {
     }
 
     public class PairNoteOptimization {
+        private double basements[];
+        private double globalBest[] = new double[2];
+        private double globalFitness = 100500;
 
+        private final double MAGIC_BLOCK = 4.0;
+        private final double c1 = 1;
+        private final double c2 = 1;
+        private final double m = 1;
+        private final int Population = 15;
+        private final int Iterations = 10;
+
+        private class Particle {
+            public double notes[];
+            public double myBest[];
+            public double velocity[];
+            public double fitness;
+
+            Particle(double basement) {
+                notes = new double[2];
+                myBest = new double[2];
+                velocity = new double[2];
+
+                notes[0] = basement;
+                notes[1] = random.nextInt(13) + 60;
+            }
+        }
+
+        PairNoteOptimization(double basements[]) {
+            this.basements = basements;
+        }
+
+        private double fitnessFunction(Particle p) {
+
+        }
+
+        public Chord[] generatePairNotes() {
+            PairNote pairNotes[] = new PairNote[ChordsAmount];
+            for (int index = 0; index < basements.length; index++) {
+                Particle particles[] = new Particle[Population];
+                for (int i = 0; i < Population; i++)
+                    particles[i] = new Particle(basements[index]);
+
+                optimize(particles);
+
+                int best = 0;
+                for (int i = 1; i < particles.length; i++)
+                    if (particles[i].fitness < particles[best].fitness)
+                        best = i;
+
+                Particle bestParticle = particles[best];
+                int notes[] = new int[ChordNotesAmount];
+                for (int k = 0; k < ChordNotesAmount; k++)
+                    notes[k] = (int)Math.round(bestParticle.notes[k]);
+
+                chords[index] = new Chord(notes);
+            }
+
+            return chords;
+        }
+
+        private void optimize(Particle particles[]) {
+            for (int iteration = 0; iteration < Iterations && globalFitness > MAGIC_BLOCK; iteration++) {
+                for (Particle p: particles) {
+                    double fitness = fitnessFunction(p);
+                    if (fitness < p.fitness) {
+                        p.fitness = fitness;
+                        for (int i = 0; i < ChordNotesAmount; i++)
+                            p.myBest[i] = p.notes[i];
+                    }
+
+                    if (fitness < globalFitness) {
+                        globalFitness = fitness;
+                        for (int i = 0; i < ChordNotesAmount; i++)
+                            globalBest[i] = p.notes[i];
+                    }
+                }
+
+                for (Particle p : particles) {
+                    int rand1 = random.nextInt(2);
+                    int rand2 = random.nextInt(2);
+
+                    for (int i = 0; i < p.velocity.length; i++)
+                        p.velocity[i] = m * p.velocity[i] + c1 * rand1 * (p.myBest[i] - p.notes[i]) + c2 * rand2 * (globalBest[i] - p.notes[i]);
+
+                }
+            }
+        }
     }
 }
