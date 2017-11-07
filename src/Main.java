@@ -45,7 +45,7 @@ public final class Main implements JMC {
 //                chords[i].notes[1] = chords[i].notes[0] + 4;
 //                chords[i].notes[2] = chords[i].notes[0] + 7;
 //            }
-            PairNote pairNotes[] = pso.generatePairNotes(chords);
+//            PairNote pairNotes[] = pso.generatePairNotes(chords);
 
             for (int i = 0; i < 16; i++) {
                 CPhrase chord = new CPhrase();
@@ -53,15 +53,15 @@ public final class Main implements JMC {
                 p.addCPhrase(chord);
             }
 
-            for (int i = 0; i < 16; i++) {
-                CPhrase pairNote = new CPhrase();
-
-                for (int j = 0; j < 2; j++) {
-                    temp[0] = pairNotes[i].notes[j];
-                    pairNote.addChord(temp, 0.5);
-                }
-                p1.addCPhrase(pairNote);
-            }
+//            for (int i = 0; i < 16; i++) {
+//                CPhrase pairNote = new CPhrase();
+//
+//                for (int j = 0; j < 2; j++) {
+//                    temp[0] = pairNotes[i].notes[j];
+//                    pairNote.addChord(temp, 0.5);
+//                }
+//                p1.addCPhrase(pairNote);
+//            }
 
             s.addPart(p);
             s.addPart(p1);

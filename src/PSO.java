@@ -41,11 +41,11 @@ public class PSO {
         private final double c2 = 1.035;
         private final double m = 0.65;
         private final int Population = 25;
-        private final int Iterations = 300;
+        private final int Iterations = 250;
         private final double MAGIC_BLOCK = 0.92;
 
         private double globalBest[] = new double[ChordsAmount];
-        private double globalFitness = 100500;
+        private double globalFitness = Double.MAX_VALUE;
 
         ChordSequence(double values[]) {
             this.values = values;
@@ -66,6 +66,7 @@ public class PSO {
                     myBest[i] = notes[i];
                     velocity[i] = 0;
                 }
+                fitness = Double.MAX_VALUE;
             }
         }
 
@@ -144,7 +145,7 @@ public class PSO {
     private class ChordOptimization {
         private double basements[];
         private double globalBest[] = new double[ChordNotesAmount];
-        private double globalFitness = 100500;
+        private double globalFitness = Double.MAX_VALUE;
 
         private final double MAGIC_BLOCK = 0.3;
         private final double c1 = 1.13;
@@ -169,7 +170,7 @@ public class PSO {
                 notes[0] = 0;
                 notes[1] = random.nextDouble() * 12;
                 notes[2] = random.nextDouble() * 12;
-                fitness = 50;
+                fitness = Double.MAX_VALUE;
             }
         }
 
@@ -181,9 +182,9 @@ public class PSO {
             double diff1 = Math.abs(p.notes[1] - (p.notes[0] + 4));
             double diff2 = Math.abs(p.notes[2] - (p.notes[0] + 7));
             if (diff1 < 1 && diff1 > -1)
-                p.blocked[0] = true;
-            if (diff2 < 1 && diff2 > -1)
                 p.blocked[1] = true;
+            if (diff2 < 1 && diff2 > -1)
+                p.blocked[2] = true;
 
             return diff1 + diff2;
         }
@@ -224,7 +225,7 @@ public class PSO {
 
         private void optimize(Particle particles[]) {
             int iteration;
-            globalFitness = 100500;
+            globalFitness = Double.MAX_VALUE;
             for (iteration = 0; iteration < Iterations && globalFitness > MAGIC_BLOCK; iteration++) {
                 for (Particle p: particles) {
                     double fitness = fitnessFunction(p);
@@ -262,7 +263,7 @@ public class PSO {
     public class PairNoteOptimization {
         private Chord chords[];
         private double globalBest[] = new double[2];
-        private double globalFitness = 100500;
+        private double globalFitness = Double.MAX_VALUE;
 
         private final double MAGIC_BLOCK = 4.0;
         private final double c1 = 1;
@@ -283,6 +284,7 @@ public class PSO {
                 notes = new double[2];
                 myBest = new double[2];
                 velocity = new double[2];
+                fitness = Double.MAX_VALUE;
 
                 notes[0] = random.nextDouble() * 12 + 72;
                 notes[1] = random.nextDouble() * 12 + 72;
@@ -328,7 +330,7 @@ public class PSO {
         }
 
         private void optimize(Particle particles[]) {
-            globalFitness = 100500;
+            globalFitness = Double.MAX_VALUE;
             for (int iteration = 0; iteration < Iterations && globalFitness > MAGIC_BLOCK; iteration++) {
                 for (Particle p: particles) {
                     double fitness = fitnessFunction(p);
