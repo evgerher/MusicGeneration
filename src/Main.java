@@ -41,6 +41,10 @@ public final class Main implements JMC {
 
             PSO pso = new PSO(values);
             Chord chords[] = pso.generateChords();
+//            for (int i = 0; i < 16; i++) {
+//                chords[i].notes[1] = chords[i].notes[0] + 4;
+//                chords[i].notes[2] = chords[i].notes[0] + 7;
+//            }
             PairNote pairNotes[] = pso.generatePairNotes(chords);
 
             for (int i = 0; i < 16; i++) {

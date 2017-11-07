@@ -146,12 +146,12 @@ public class PSO {
         private double globalBest[] = new double[ChordNotesAmount];
         private double globalFitness = 100500;
 
-        private final double MAGIC_BLOCK = 0.9;
-        private final double c1 = 1.1;
-        private final double c2 = 1.2;
+        private final double MAGIC_BLOCK = 0.3;
+        private final double c1 = 1.13;
+        private final double c2 = 1.18;
         private final double m = 0.75;
         private final int Population = 20;
-        private final int Iterations = 100;
+        private final int Iterations = 300;
 
         private class Particle {
             public double notes[];
@@ -169,6 +169,7 @@ public class PSO {
                 notes[0] = 0;
                 notes[1] = random.nextDouble() * 12;
                 notes[2] = random.nextDouble() * 12;
+                fitness = 50;
             }
         }
 
@@ -177,14 +178,14 @@ public class PSO {
         }
 
         private double fitnessFunction(Particle p) {
-            double diff1 = p.notes[1] - (p.notes[0] + 4);
-            double diff2 = p.notes[2] - (p.notes[0] + 7);
+            double diff1 = Math.abs(p.notes[1] - (p.notes[0] + 4));
+            double diff2 = Math.abs(p.notes[2] - (p.notes[0] + 7));
             if (diff1 < 1 && diff1 > -1)
                 p.blocked[0] = true;
             if (diff2 < 1 && diff2 > -1)
                 p.blocked[1] = true;
 
-            return Math.abs(diff1 + diff2);
+            return diff1 + diff2;
         }
 
         public Chord[] generateChords() {
