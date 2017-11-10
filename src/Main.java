@@ -30,13 +30,13 @@ public final class Main implements JMC {
         int temp[] = new int[1];
         double values[] = new double[16];
 
-        double step = 360.0 / 16;
+        double step = 540.0 / 16;
         for (int i = 0; i < values.length; i++) {
             values[i] = Math.toRadians(i * step);
             values[i] = Math.sin(values[i]);
         }
 
-        for (int trie = 0; trie < 5; trie++) {
+        for (int trie = 1; trie < 2; trie++) {
 
 
             PSO pso = new PSO(values);
@@ -45,7 +45,7 @@ public final class Main implements JMC {
 //                chords[i].notes[1] = chords[i].notes[0] + 4;
 //                chords[i].notes[2] = chords[i].notes[0] + 7;
 //            }
-//            PairNote pairNotes[] = pso.generatePairNotes(chords);
+            PairNote pairNotes[] = pso.generatePairNotes(chords);
 
             for (int i = 0; i < 16; i++) {
                 CPhrase chord = new CPhrase();
@@ -53,19 +53,30 @@ public final class Main implements JMC {
                 p.addCPhrase(chord);
             }
 
-//            for (int i = 0; i < 16; i++) {
-//                CPhrase pairNote = new CPhrase();
-//
-//                for (int j = 0; j < 2; j++) {
-//                    temp[0] = pairNotes[i].notes[j];
-//                    pairNote.addChord(temp, 0.5);
-//                }
-//                p1.addCPhrase(pairNote);
-//            }
+            for (int i = 0; i < 16; i++) {
+                CPhrase pairNote = new CPhrase();
+
+                for (int j = 0; j < 2; j++) {
+                    temp[0] = pairNotes[i].notes[j];
+                    pairNote.addChord(temp, 0.5);
+                }
+                p1.addCPhrase(pairNote);
+            }
+
+            for (int i = 0; i < 16; i++) {
+                System.out.printf("[");
+                for (int j = 0; j < 3; j++)
+                    System.out.printf(" %d ", chords[i].notes[j]);
+                System.out.printf("] [");
+//                pairNotes[i].notes[1] = pairNotes[i].notes[0] + 2;
+                for (int j = 0; j < 2; j++)
+                    System.out.printf(" %d ", pairNotes[i].notes[j]);
+                System.out.printf("]\n");
+            }
 
             s.addPart(p);
             s.addPart(p1);
-            String name = "Try" + Integer.toString(trie) + ".mid";
+            String name = "Sin" + Integer.toString(trie) + ".mid";
             Write.midi(s, name);
 
             p.removeAllPhrases();

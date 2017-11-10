@@ -6,7 +6,6 @@ import java.util.Random;
 public class PSO {
     private Random random;
     private double values[];
-    private Chord chords[];
     private final int ChordNotesAmount = 3;
     private final int ChordsAmount = 16;
 
@@ -91,10 +90,10 @@ public class PSO {
             for (int i = 0; i < ChordsAmount; i++)
                 p.notes[i] = Math.round(66 + p.notes[i] * 6);
 
-            System.out.printf("\n\nBasement of chord [");
-            for (int i = 0; i < 15; i++)
-                System.out.printf("%d, ", (int)Math.round(p.notes[i]));
-            System.out.printf("%d]\n\n", (int)Math.round(p.notes[15]));
+//            System.out.printf("\n\nBasement of chord [");
+//            for (int i = 0; i < 15; i++)
+//                System.out.printf("%d, ", (int)Math.round(p.notes[i]));
+//            System.out.printf("%d]\n\n", (int)Math.round(p.notes[15]));
 
             return p;
         }
@@ -127,7 +126,7 @@ public class PSO {
                     }
                 }
             }
-            System.out.println("Iteration = " + Integer.toString(iteration));
+//            System.out.println("Iteration = " + Integer.toString(iteration));
         }
 
         private double fitnessFunction(Particle particle) {
@@ -209,17 +208,17 @@ public class PSO {
                 for (int k = 1; k < ChordNotesAmount; k++)
                     notes[k] = (int)Math.round(bestParticle.notes[k] + notes[0]);
 
-                System.out.printf("Best chord :: [%d %d %d]\n", notes[0], notes[1], notes[2]);
+//                System.out.printf("Best chord :: [%d %d %d]\n", notes[0], notes[1], notes[2]);
                 chords[index] = new Chord(notes);
             }
 
-            for (int i = 0; i < chords.length; i++) {
-                System.out.printf("[ ");
-                for(int j = 0; j < chords[0].notes.length; j++) {
-                    System.out.printf("%d ", chords[i].notes[j]);
-                }
-                System.out.printf("]\n");
-            }
+//            for (int i = 0; i < chords.length; i++) {
+//                System.out.printf("[ ");
+//                for(int j = 0; j < chords[0].notes.length; j++) {
+//                    System.out.printf("%d ", chords[i].notes[j]);
+//                }
+//                System.out.printf("]\n");
+//            }
             return chords;
         }
 
@@ -255,8 +254,8 @@ public class PSO {
 
                 }
             }
-            System.out.println("BestFitness :: " + Double.toString(globalFitness));
-            System.out.println("ChordOptEndIteration :: " + Integer.toString(iteration));
+//            System.out.println("BestFitness :: " + Double.toString(globalFitness));
+//            System.out.println("ChordOptEndIteration :: " + Integer.toString(iteration));
         }
     }
 
@@ -265,12 +264,12 @@ public class PSO {
         private double globalBest[] = new double[2];
         private double globalFitness = Double.MAX_VALUE;
 
-        private final double MAGIC_BLOCK = 4.0;
-        private final double c1 = 1;
-        private final double c2 = 1;
-        private final double m = 1;
+        private final double MAGIC_BLOCK = 0.5;
+        private final double c1 = 1.05;
+        private final double c2 = 1.05;
+        private final double m = 0.67;
         private final int Population = 15;
-        private final int Iterations = 10;
+        private final int Iterations = 100;
 
         private class Particle {
             public int chordNotes[];
@@ -299,9 +298,14 @@ public class PSO {
             double diff1 = Math.abs((p.chordNotes[0] + 12) - p.notes[0]);
             double diff2 = Math.abs((p.chordNotes[1] + 12) - p.notes[0]);
             double diff3 = Math.abs((p.chordNotes[2] + 12) - p.notes[0]);
-
             double diff_min = Math.min(diff1, diff2);
-            return Math.min(diff_min, diff3);
+
+            double secondNoteDiff = Math.abs(p.notes[0] - p.notes[1]);
+            diff_min = Math.min(diff_min, diff3);
+            if (secondNoteDiff >= 6)
+                diff_min += secondNoteDiff;
+
+            return diff_min;
         }
 
         public PairNote[] generatePairNotes() {
@@ -330,8 +334,9 @@ public class PSO {
         }
 
         private void optimize(Particle particles[]) {
+            int iteration;
             globalFitness = Double.MAX_VALUE;
-            for (int iteration = 0; iteration < Iterations && globalFitness > MAGIC_BLOCK; iteration++) {
+            for (iteration = 0; iteration < Iterations && globalFitness > MAGIC_BLOCK; iteration++) {
                 for (Particle p: particles) {
                     double fitness = fitnessFunction(p);
                     if (fitness < p.fitness) {
@@ -357,6 +362,9 @@ public class PSO {
                     }
                 }
             }
+
+            System.out.printf("Amount of iterations :: PairNote :: %d\n", iteration);
+            System.out.printf("Global fitness :: PairNote :: %.2f\n", globalFitness);
         }
     }
 }
