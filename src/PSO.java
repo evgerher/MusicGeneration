@@ -319,7 +319,7 @@ public class PSO {
 
             double secondNoteDiff = Math.abs(p.notes[0] - p.notes[1]);
             diff_min = Math.min(diff_min, diff3);
-            if (secondNoteDiff >= 6)
+            if (secondNoteDiff >= 4)
                 diff_min += secondNoteDiff;
 
             return diff_min;
@@ -334,15 +334,17 @@ public class PSO {
 
                 optimize(particles);
 
-                int best = 0;
-                for (int i = 1; i < particles.length; i++)
-                    if (particles[i].fitness < particles[best].fitness)
-                        best = i;
+//                int best = 0;
+//                for (int i = 1; i < particles.length; i++)
+//                    if (particles[i].fitness < particles[best].fitness)
+//                        best = i;
 
-                Particle bestParticle = particles[best];
+//                Particle bestParticle = particles[best];
                 int notes[] = new int[2];
-                for (int k = 0; k < 2; k++)
-                    notes[k] = (int)Math.round(bestParticle.notes[k]);
+                notes[0] = (int)globalBest[0];
+                notes[1] = (int)globalBest[1];
+//                for (int k = 0; k < 2; k++)
+//                    notes[k] = (int)Math.round(bestParticle.notes[k]);
 
                 pairNotes[index] = new PairNote(notes);
             }
@@ -364,8 +366,8 @@ public class PSO {
 
                     if (fitness < globalFitness) {
                         globalFitness = fitness;
-                        globalBest[0] = p.notes[0];
-                        globalBest[1] = p.notes[0] + random.nextDouble() * 3;
+                        for (int i = 0; i < 2; i++)
+                            globalBest[i] = p.notes[i];
                     }
                 }
 
