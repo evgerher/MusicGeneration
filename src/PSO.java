@@ -347,8 +347,8 @@ public class PSO {
 
                     if (fitness < globalFitness) {
                         globalFitness = fitness;
-                        for (int i = 0; i < 2; i++)
-                            globalBest[i] = p.notes[i];
+                        globalBest[0] = p.notes[0];
+                        globalBest[1] = p.notes[0] + random.nextDouble() * 3;
                     }
                 }
 

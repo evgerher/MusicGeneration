@@ -10,6 +10,7 @@ public final class Main implements JMC {
     private static Score s;
     private static Part p;
     private static Part p1;
+    static int type = 2;
 
 
     public static void main(String[] args){
@@ -28,17 +29,19 @@ public final class Main implements JMC {
         p1 = new Part("PairNote", 0, 1);
 
         int temp[] = new int[1];
-        double values[] = new double[16];
-
-        double step = 540.0 / 16;
-        for (int i = 0; i < values.length; i++) {
-            values[i] = Math.toRadians(i * step);
-            values[i] = Math.sin(values[i]);
-        }
-
-        for (int trie = 1; trie < 2; trie++) {
+//        double values[] = new double[16];
 
 
+//        double step = 540.0 / 16;
+//        for (int i = 0; i < values.length; i++) {
+//            values[i] = Math.toRadians(i * step);
+//            values[i] = Math.sin(values[i]);
+//        }
+//        double[] values = new double[16];
+        double[] values = new double[]{0, 0, -0.3, -0.7, -0.7, -0.3, -0.7, -0.7, -0.3, 0, 0.3, 0.6, 0.8, 0.9, 0.8, 0.8, 0.5};
+
+
+       for (int trie = 0; trie < 3; trie++) {
             PSO pso = new PSO(values);
             Chord chords[] = pso.generateChords();
 //            for (int i = 0; i < 16; i++) {
@@ -76,7 +79,7 @@ public final class Main implements JMC {
 
             s.addPart(p);
             s.addPart(p1);
-            String name = "Sin" + Integer.toString(trie) + ".mid";
+            String name = "Manual" + Integer.toString(type) + Integer.toString(trie) + ".mid";
             Write.midi(s, name);
 
             p.removeAllPhrases();
