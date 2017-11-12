@@ -29,16 +29,15 @@ public final class Main implements JMC {
         p1 = new Part("PairNote", 0, 1);
 
         int temp[] = new int[1];
-//        double values[] = new double[16];
+        double values[] = new double[16];
 
 
-//        double step = 540.0 / 16;
-//        for (int i = 0; i < values.length; i++) {
-//            values[i] = Math.toRadians(i * step);
-//            values[i] = Math.sin(values[i]);
-//        }
-//        double[] values = new double[16];
-        double[] values = new double[]{0, 0, -0.3, -0.7, -0.7, -0.3, -0.7, -0.7, -0.3, 0, 0.3, 0.6, 0.8, 0.9, 0.8, 0.8, 0.5};
+        double step = 540.0 / 16;
+        for (int i = 0; i < values.length; i++) {
+            values[i] = Math.toRadians(i * step);
+            values[i] = Math.sin(values[i]);
+        }
+//        double[] values = new double[]{0, 0, -0.3, -0.7, -0.7, -0.3, -0.7, -0.7, -0.3, 0, 0.3, 0.6, 0.8, 0.9, 0.8, 0.8, 0.5};
 
 
        for (int trie = 0; trie < 3; trie++) {

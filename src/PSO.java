@@ -88,7 +88,7 @@ public class PSO {
 
             Particle p = particles[index];
             for (int i = 0; i < ChordsAmount; i++)
-                p.notes[i] = Math.round(66 + p.notes[i] * 6);
+                p.notes[i] = Math.round(65 + p.notes[i] * 5);
 
 //            System.out.printf("\n\nBasement of chord [");
 //            for (int i = 0; i < 15; i++)
@@ -146,6 +146,9 @@ public class PSO {
         private double globalBest[] = new double[ChordNotesAmount];
         private double globalFitness = Double.MAX_VALUE;
 
+        private int secondNoteVector;
+        private int thirdNoteVector;
+
         private final double MAGIC_BLOCK = 0.3;
         private final double c1 = 1.13;
         private final double c2 = 1.18;
@@ -178,8 +181,8 @@ public class PSO {
         }
 
         private double fitnessFunction(Particle p) {
-            double diff1 = Math.abs(p.notes[1] - (p.notes[0] + 4));
-            double diff2 = Math.abs(p.notes[2] - (p.notes[0] + 7));
+            double diff1 = Math.abs(p.notes[1] - secondNoteVector);
+            double diff2 = Math.abs(p.notes[2] - thirdNoteVector);
             if (diff1 < 1 && diff1 > -1)
                 p.blocked[1] = true;
             if (diff2 < 1 && diff2 > -1)
@@ -195,6 +198,7 @@ public class PSO {
                 for (int i = 0; i < Population; i++)
                     particles[i] = new Particle();
 
+                setUpFitnessFunction((int)basements[index]);
                 optimize(particles);
 
                 int best = 0;
@@ -220,6 +224,19 @@ public class PSO {
 //                System.out.printf("]\n");
 //            }
             return chords;
+        }
+
+        private void setUpFitnessFunction(int value) {
+            if (value % 12 <= 3) {
+                secondNoteVector = 3;
+                thirdNoteVector = 7;
+            } else if (value % 12 >= 7) {
+                secondNoteVector = -7;
+                thirdNoteVector = -3;
+            } else if (value % 12 >= 4) {
+                secondNoteVector = -3;
+                thirdNoteVector = 4;
+            }
         }
 
         private void optimize(Particle particles[]) {
@@ -269,7 +286,7 @@ public class PSO {
         private final double c2 = 1.05;
         private final double m = 0.67;
         private final int Population = 15;
-        private final int Iterations = 100;
+        private final int Iterations = 50;
 
         private class Particle {
             public int chordNotes[];
