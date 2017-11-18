@@ -9,6 +9,9 @@ public class PSO {
     private final int ChordNotesAmount = 3;
     private final int ChordsAmount = 16;
 
+    private final int C_MAJOR[] = new int[]{60, 62, 64, 65, 67, 69, 71, 72};
+    private final int POSSIBLE_CHORD_BASEMENTS[] = new int[]{60, 64, 65};
+    private final int OCTAVE_DIFFERENCE = 12;
 
     PSO(double values[]) {
         this.values = values;
@@ -17,11 +20,8 @@ public class PSO {
 
     public Chord[] generateChords() {
         ChordSequence chSeq = new ChordSequence(values);
-
         ChordSequence.Particle bestChordBases = chSeq.generateBaseOfChords();
-
         ChordOptimization chOpt = new ChordOptimization(bestChordBases.notes);
-
         Chord chords[] = chOpt.generateChords();
 
         return chords;
@@ -45,9 +45,7 @@ public class PSO {
 
         private double globalBest[] = new double[ChordsAmount];
         private double globalFitness = Double.MAX_VALUE;
-
-//        private double possibleValues[] = new double[]{60, 62, 64, 65, 67, 69, 71, 72};
-        private double possibleValues[] = new double[]{60, 64, 65};
+        private int possibleValues[] = POSSIBLE_CHORD_BASEMENTS;
 
         ChordSequence(double values[]) {
             this.values = values;
@@ -92,7 +90,7 @@ public class PSO {
             Particle p = particles[index];
             for (int i = 0; i < ChordsAmount; i++) {
                 p.notes[i] = Math.round(63 + p.notes[i] * 4);
-                p.notes[i] = closestValue(p.notes[i]);
+                p.notes[i] = closestValue(p.notes[i], possibleValues, 0);
             }
 //            System.out.printf("\n\nBasement of chord [");
 //            for (int i = 0; i < 15; i++)
@@ -100,19 +98,6 @@ public class PSO {
 //            System.out.printf("%d]\n\n", (int)Math.round(p.notes[15]));
 
             return p;
-        }
-
-        private double closestValue(double value) {
-            int bestIndex = 0;
-            double bestDifference = Double.MAX_VALUE;
-            for (int i = 0; i < possibleValues.length; i++) {
-                if (Math.abs(possibleValues[i] - value) < bestDifference) {
-                    bestDifference = Math.abs(possibleValues[i] - value);
-                    bestIndex = i;
-                }
-            }
-
-            return possibleValues[bestIndex];
         }
 
         private void optimize(Particle[] particles) {
@@ -229,17 +214,8 @@ public class PSO {
                 for (int k = 1; k < ChordNotesAmount; k++)
                     notes[k] = (int)Math.round(bestParticle.notes[k] + notes[0]);
 
-//                System.out.printf("Best chord :: [%d %d %d]\n", notes[0], notes[1], notes[2]);
                 chords[index] = new Chord(notes);
             }
-
-//            for (int i = 0; i < chords.length; i++) {
-//                System.out.printf("[ ");
-//                for(int j = 0; j < chords[0].notes.length; j++) {
-//                    System.out.printf("%d ", chords[i].notes[j]);
-//                }
-//                System.out.printf("]\n");
-//            }
             return chords;
         }
 
@@ -290,8 +266,6 @@ public class PSO {
 
                 }
             }
-//            System.out.println("BestFitness :: " + Double.toString(globalFitness));
-//            System.out.println("ChordOptEndIteration :: " + Integer.toString(iteration));
         }
     }
 
@@ -321,8 +295,8 @@ public class PSO {
                 velocity = new double[2];
                 fitness = Double.MAX_VALUE;
 
-                notes[0] = random.nextDouble() * 12 + 72;
-                notes[1] = random.nextDouble() * 12 + 72;
+                notes[0] = random.nextDouble() * 12 + OCTAVE_DIFFERENCE * 6;
+                notes[1] = random.nextDouble() * 12 + OCTAVE_DIFFERENCE * 6;
             }
         }
 
@@ -331,9 +305,9 @@ public class PSO {
         }
 
         private double fitnessFunction(Particle p) {
-            double diff1 = Math.abs((p.chordNotes[0] + 12) - p.notes[0]);
-            double diff2 = Math.abs((p.chordNotes[1] + 12) - p.notes[0]);
-            double diff3 = Math.abs((p.chordNotes[2] + 12) - p.notes[0]);
+            double diff1 = Math.abs((p.chordNotes[0] + OCTAVE_DIFFERENCE) - p.notes[0]);
+            double diff2 = Math.abs((p.chordNotes[1] + OCTAVE_DIFFERENCE) - p.notes[0]);
+            double diff3 = Math.abs((p.chordNotes[2] + OCTAVE_DIFFERENCE) - p.notes[0]);
             double diff_min = Math.min(diff1, diff2);
 
             double secondNoteDiff = Math.abs(p.notes[0] - p.notes[1]);
@@ -353,18 +327,10 @@ public class PSO {
 
                 optimize(particles);
 
-//                int best = 0;
-//                for (int i = 1; i < particles.length; i++)
-//                    if (particles[i].fitness < particles[best].fitness)
-//                        best = i;
-
-//                Particle bestParticle = particles[best];
                 int notes[] = new int[2];
                 notes[0] = (int)globalBest[0];
                 notes[1] = (int)globalBest[1];
-//                for (int k = 0; k < 2; k++)
-//                    notes[k] = (int)Math.round(bestParticle.notes[k]);
-
+                notes[1] = closestValue(globalBest[1], C_MAJOR, OCTAVE_DIFFERENCE);
                 pairNotes[index] = new PairNote(notes);
             }
 
@@ -404,5 +370,14 @@ public class PSO {
             System.out.printf("Amount of iterations :: PairNote :: %d\n", iteration);
             System.out.printf("Global fitness :: PairNote :: %.2f\n", globalFitness);
         }
+    }
+
+    private int closestValue(double v, int[] values, int difference) {
+        int index = 0;
+        for (int i = 0; i < values.length; i++)
+            if (Math.abs(values[i] - (v - difference)) < Math.abs((v - difference) - values[index]))
+                index = i;
+
+        return values[index] + difference;
     }
 }
