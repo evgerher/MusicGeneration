@@ -3,8 +3,9 @@ import java.util.Random;
 /**
  * Created by evger on 03-Nov-17.
  */
-public class Chord extends SoundUnit {
+public class Chord {
     private final int notesAmount = 3;
+    public int notes[];
 
     public Chord(int notes[]) {
         this.notes = new int[notesAmount];

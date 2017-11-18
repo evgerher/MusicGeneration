@@ -1,8 +1,9 @@
 /**
  * Created by evger on 03-Nov-17.
  */
-public class PairNote extends SoundUnit {
+public class PairNote {
     private final int notesAmount = 2;
+    public int notes[];
 
     public PairNote(int notes[]) {
         this.notes = new int[notesAmount];
