@@ -46,6 +46,9 @@ public class PSO {
         private double globalBest[] = new double[ChordsAmount];
         private double globalFitness = Double.MAX_VALUE;
 
+//        private double possibleValues[] = new double[]{60, 62, 64, 65, 67, 69, 71, 72};
+        private double possibleValues[] = new double[]{60, 64, 65};
+
         ChordSequence(double values[]) {
             this.values = values;
         }
@@ -87,15 +90,29 @@ public class PSO {
                     index = i;
 
             Particle p = particles[index];
-            for (int i = 0; i < ChordsAmount; i++)
-                p.notes[i] = Math.round(65 + p.notes[i] * 5);
-
+            for (int i = 0; i < ChordsAmount; i++) {
+                p.notes[i] = Math.round(63 + p.notes[i] * 4);
+                p.notes[i] = closestValue(p.notes[i]);
+            }
 //            System.out.printf("\n\nBasement of chord [");
 //            for (int i = 0; i < 15; i++)
 //                System.out.printf("%d, ", (int)Math.round(p.notes[i]));
 //            System.out.printf("%d]\n\n", (int)Math.round(p.notes[15]));
 
             return p;
+        }
+
+        private double closestValue(double value) {
+            int bestIndex = 0;
+            double bestDifference = Double.MAX_VALUE;
+            for (int i = 0; i < possibleValues.length; i++) {
+                if (Math.abs(possibleValues[i] - value) < bestDifference) {
+                    bestDifference = Math.abs(possibleValues[i] - value);
+                    bestIndex = i;
+                }
+            }
+
+            return possibleValues[bestIndex];
         }
 
         private void optimize(Particle[] particles) {
@@ -227,16 +244,18 @@ public class PSO {
         }
 
         private void setUpFitnessFunction(int value) {
-            if (value % 12 <= 3) {
-                secondNoteVector = 3;
-                thirdNoteVector = 7;
-            } else if (value % 12 >= 7) {
-                secondNoteVector = -7;
-                thirdNoteVector = -3;
-            } else if (value % 12 >= 4) {
-                secondNoteVector = -3;
-                thirdNoteVector = 4;
-            }
+//            if (value % 12 <= 3) {
+//                secondNoteVector = 3;
+//                thirdNoteVector = 7;
+//            } else if (value % 12 >= 7) {
+//                secondNoteVector = -7;
+//                thirdNoteVector = -3;
+//            } else if (value % 12 >= 4) {
+//                secondNoteVector = -3;
+//                thirdNoteVector = 4;
+//            }
+            secondNoteVector = 4;
+            thirdNoteVector = 7;
         }
 
         private void optimize(Particle particles[]) {

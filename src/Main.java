@@ -23,7 +23,7 @@ public final class Main implements JMC {
         double values[] = new double[16];
 
 
-        double step = 540.0 / 16;
+        double step = 720.0 / 16;
         for (int i = 0; i < values.length; i++) {
             values[i] = Math.toRadians(i * step);
             values[i] = Math.sin(values[i]);
